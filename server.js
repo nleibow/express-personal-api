@@ -1,6 +1,9 @@
 // require express and other modules
+var db = require('./models');
+var request = require('request');
 var express = require('express'),
     app = express();
+   
 
 // parse incoming urlencoded form data
 // and populate the req.body object
@@ -53,6 +56,45 @@ app.get('/api', function api_index(req, res) {
 /**********
  * SERVER *
  **********/
+ app.get('/api/profile', function profileIndex(req,res){
+  res.json({
+    name: "nathan leibowitz",
+    githubLink: "https://github.com/nleibow",
+    githubBio: "https://github.com/settings/profile",
+    currentCity: "denver",
+    pets: ["dog", "cat"]
+  })
+ });
+
+
+ app.get('/api/places/:id', function(req, res){
+  var idd = req.params.id
+   db.Place.findOne({"_id": idd}, function(err, places) {
+  res.json(places);
+    }
+ );});
+
+ app.get("/api/places", function placesindex(req, res){
+  res.json([{
+    place: "denver",
+    address: "its denver go look at a map"
+  },
+  {
+    place: "new york",
+    address: "its new york go look at a map"
+  },
+  {
+    place: "california",
+    address: "its california go look at a map"
+  }]
+ )});
+
+app.post('/api/places/', function new_album(req, res){
+  db.Place.create(req.body, function(err, albums) {
+  res.redirect('http://localhost:3000/api/places');});
+});
+
+
 
 // listen on port 3000
 app.listen(process.env.PORT || 3000, function () {
